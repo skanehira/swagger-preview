@@ -1,23 +1,27 @@
-# mpr
-`mpr` can preview markdown, asciidoc and swagger.
+# spr
+`spr` can preview swagger.
 
 ## Features
-- preview
+- preview swagger
 - live reload
 
 ## Instllation
 
 ```sh
-$ git clone https://github.com/skanehira/mpr
-$ cd mpr && go install
+$ git clone https://github.com/skanehira/spr
+$ cd spr && go install
 ```
 
 ## Usage
 
 ```
-$ mpr sample.md
-$ mpr sample.adoc
-$ mpr swagger.yaml
+$ spr swagger.yaml
+2021/02/02 21:51:46 start server: 9999
+2021/02/02 21:51:46 watching swagger.yaml
+
+$ PORT=8080 spr api/swagger.yaml
+2021/02/02 21:51:46 start server: 8080
+2021/02/02 21:51:46 watching api/swagger.yaml
 ```
 
 ## Author
