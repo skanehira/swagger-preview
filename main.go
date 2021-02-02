@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/fsnotify/fsnotify"
+	"github.com/gobuffalo/packr/v2"
 	"github.com/gorilla/websocket"
 )
 
@@ -75,7 +76,7 @@ func main() {
 							if !old.Equal(now) {
 								old = now
 
-								fmt.Println("update...")
+								log.Println("update...")
 								b, err := ioutil.ReadFile(fileName)
 								if err != nil {
 									log.Println(err)
@@ -123,7 +124,9 @@ func main() {
 			}
 		}
 	})
-	http.Handle("/", http.FileServer(http.Dir(".")))
+
+	box := packr.New("static", "./static")
+	http.Handle("/", http.FileServer(box))
 	log.Println("start http server :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
