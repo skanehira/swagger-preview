@@ -1,18 +1,41 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"runtime"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/gorilla/websocket"
 )
+
+func OpenBrowser(url string) error {
+	args := []string{}
+	switch runtime.GOOS {
+	case "windows":
+		r := strings.NewReplacer("&", "^&")
+		args = []string{"cmd", "start", "/", r.Replace(url)}
+	case "linux":
+		args = []string{"xdg-open", url}
+	case "darwin":
+		args = []string{"open", url}
+	}
+
+	out, err := exec.Command(args[0], args[1:]...).CombinedOutput()
+	if err != nil {
+		return errors.New(string(out))
+	}
+	return nil
+}
 
 var upgrader = websocket.Upgrader{}
 
@@ -204,5 +227,9 @@ func main() {
 	})
 	log.Println("start server:", port)
 	log.Println("watching", fileName)
+
+	if err := OpenBrowser("http://localhost:" + port); err != nil {
+		log.Println("cannot open browser", err)
+	}
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
