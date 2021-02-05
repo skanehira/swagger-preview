@@ -216,14 +216,10 @@ func main() {
 	if p := os.Getenv("PORT"); p != "" {
 		port = p
 	}
-	fh := http.FileServer(http.Dir("."))
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == "/" {
-			body := fmt.Sprintf(indexHTML, port)
-			w.Write([]byte(body))
-			return
-		}
-		fh.ServeHTTP(w, r)
+		body := fmt.Sprintf(indexHTML, port)
+		w.Write([]byte(body))
+		return
 	})
 	log.Println("start server:", port)
 	log.Println("watching", fileName)
