@@ -184,8 +184,15 @@ func main() {
 		}
 		defer c.Close()
 
+		b, err := ioutil.ReadFile(fileName)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+
 		resp := map[string]interface{}{
 			"fileName": fileName,
+			"message":  string(b),
 		}
 		if err := c.WriteJSON(resp); err != nil {
 			log.Println(err)
