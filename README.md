@@ -9,7 +9,7 @@
 
 ```sh
 $ git clone https://github.com/skanehira/spr
-$ cd spr && go install ./...
+$ cd spr && go install ./cmd/spr
 ```
 
 ## Usage
