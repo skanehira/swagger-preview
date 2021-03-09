@@ -44,7 +44,7 @@ var indexHTML = `
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>spr</title>
+  <title>mpr</title>
 </head>
 <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.41.1/swagger-ui.css" >
@@ -72,6 +72,7 @@ const app = new Vue({
       const resp = JSON.parse(ev.data)
       if (!isFirst) {
         this.ui = SwaggerUIBundle({
+          url : resp.fileName,
           dom_id: '#ui',
           deepLinking: true,
           presets: [
@@ -83,7 +84,6 @@ const app = new Vue({
           ],
           layout: "StandaloneLayout"
         })
-		this.ui.specActions.updateSpec(resp.message)
         isFirst = true
         return
       }
