@@ -1,15 +1,15 @@
-# spr
-`spr` can preview swagger.
+# swagger-preview
+`swagger-preview` can preview swagger.
 
 ## Features
 - preview swagger
 - live reload
 
 ## Instllation
+This is only can install with Go 1.16~ 
 
 ```sh
-$ git clone https://github.com/skanehira/spr
-$ cd spr && go install ./cmd/spr
+$ go install github.com/skanehira/swagger-preview/cmd/spr@latest
 ```
 
 ## Usage
@@ -28,4 +28,4 @@ $ PORT=8080 spr api/swagger.yaml
 skanehira
 
 ## Thanks
-https://github.com/swagger-api/swagger-ui
+- https://github.com/swagger-api/swagger-ui
