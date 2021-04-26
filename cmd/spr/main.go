@@ -16,6 +16,8 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/gorilla/websocket"
+
+	_ "embed"
 )
 
 func OpenBrowser(url string) error {
@@ -37,73 +39,8 @@ func OpenBrowser(url string) error {
 	return nil
 }
 
-var upgrader = websocket.Upgrader{}
-
-var indexHTML = `
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <title>spr</title>
-</head>
-<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
-<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.41.1/swagger-ui.css" >
-<script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.41.1/swagger-ui-bundle.js"> </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.41.1/swagger-ui-standalone-preset.js"> </script>
-<body>
-  <div id="app">
-    <div id="ui"></div>
-  </div>
-</body>
-<script>
-const app = new Vue({
-  el: '#app',
-  data: {
-    ui: {},
-    ws: {},
-  },
-  methods: {
-  },
-  mounted(){
-    this.ws = new WebSocket("ws://localhost:%s/ws")
-
-    let isFirst = false
-    this.ws.onmessage = (ev) => {
-      const resp = JSON.parse(ev.data)
-      if (!isFirst) {
-        this.ui = SwaggerUIBundle({
-          dom_id: '#ui',
-          deepLinking: true,
-          presets: [
-            SwaggerUIBundle.presets.apis,
-            SwaggerUIStandalonePreset
-          ],
-          plugins: [
-            SwaggerUIBundle.plugins.DownloadUrl
-          ],
-          layout: "StandaloneLayout"
-        })
-		this.ui.specActions.updateSpec(resp.message)
-        isFirst = true
-        return
-      }
-
-      console.log("update");
-      this.ui.specActions.updateSpec(resp.message)
-    }
-
-    this.ws.onerr = (err) => {
-      console.log(err)
-    }
-
-    window.onbeforeunload = () => {
-      this.ws.send(0)
-    }
-  }
-})
-</script>
-</html>
-`
+//go:embed index.html
+var index string
 
 func main() {
 	if len(os.Args) < 2 {
@@ -117,14 +54,15 @@ func main() {
 
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		log.Fatal(err)
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 	defer watcher.Close()
 
 	fi, err := os.Stat(fileName)
 	if err != nil {
-		log.Println(err)
-		return
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 	old := fi.ModTime()
 
@@ -176,10 +114,12 @@ func main() {
 		log.Fatal(err)
 	}
 
+	var upgrader = websocket.Upgrader{}
+
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		c, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
-			log.Print("upgrade:", err)
+			log.Println(err)
 			return
 		}
 		defer c.Close()
@@ -224,7 +164,7 @@ func main() {
 		port = p
 	}
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		body := fmt.Sprintf(indexHTML, port)
+		body := fmt.Sprintf(index, port)
 		w.Write([]byte(body))
 		return
 	})
