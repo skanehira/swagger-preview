@@ -160,7 +160,7 @@ Arch: %s
 		done := make(chan bool)
 		go func() {
 			// close websocket when recive some message
-			c.ReadMessage()
+			_, _, _ = c.ReadMessage()
 			done <- true
 		}()
 		for {
@@ -183,8 +183,7 @@ Arch: %s
 	}
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		body := fmt.Sprintf(index, port)
-		w.Write([]byte(body))
-		return
+		_, _ = w.Write([]byte(body))
 	})
 	log.Println("start server:", port)
 	log.Println("watching", fileName)
