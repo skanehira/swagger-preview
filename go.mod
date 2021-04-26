@@ -1,4 +1,4 @@
-module github.com/skanehira/mpr
+module github.com/skanehira/swagger-preview
 
 go 1.16
 
