@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -42,7 +43,24 @@ func OpenBrowser(url string) error {
 //go:embed index.html
 var index string
 
+var (
+	Version  = "dev"
+	Revision = "dev"
+)
+
+var printVersion = flag.Bool("v", false, "version")
+
 func main() {
+	flag.Parse()
+
+	if *printVersion {
+		fmt.Printf(`Version: %s
+Revision: %s
+OS: %s
+Arch: %s
+`, Version, Revision, runtime.GOOS, runtime.GOARCH)
+		return
+	}
 	if len(os.Args) < 2 {
 		fmt.Fprintln(os.Stderr, "please specify file")
 		os.Exit(1)
