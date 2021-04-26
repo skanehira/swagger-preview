@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>spr</title>
+</head>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.41.1/swagger-ui.css" >
+<script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.41.1/swagger-ui-bundle.js"> </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.41.1/swagger-ui-standalone-preset.js"> </script>
+<body>
+  <div id="app">
+    <div id="ui"></div>
+  </div>
+</body>
+<script>
+const app = new Vue({
+  el: '#app',
+  data: {
+    ui: {},
+    ws: {},
+  },
+  methods: {
+  },
+  mounted(){
+    this.ws = new WebSocket("ws://localhost:%s/ws")
+
+    let isFirst = false
+    this.ws.onmessage = (ev) => {
+      const resp = JSON.parse(ev.data)
+      if (!isFirst) {
+        this.ui = SwaggerUIBundle({
+          dom_id: '#ui',
+          deepLinking: true,
+          presets: [
+            SwaggerUIBundle.presets.apis,
+            SwaggerUIStandalonePreset
+          ],
+          plugins: [
+            SwaggerUIBundle.plugins.DownloadUrl
+          ],
+          layout: "StandaloneLayout"
+        })
+        this.ui.specActions.updateSpec(resp.message)
+        isFirst = true
+        return
+      }
+
+      console.log("update");
+      this.ui.specActions.updateSpec(resp.message)
+    }
+
+    this.ws.onerr = (err) => {
+      console.log(err)
+    }
+
+    window.onbeforeunload = () => {
+      this.ws.send(0)
+    }
+  }
+})
+</script>
+</html>
+
